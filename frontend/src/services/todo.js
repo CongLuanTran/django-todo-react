@@ -1,0 +1,26 @@
+import axios from 'axios'
+const baseUrl = 'http://localhost:8000/api/todos/'
+
+const getAll = async () => {
+  const response = await axios.get(baseUrl)
+  return response.data
+}
+
+const createTodo = async newObject => {
+  const response = await axios.post(baseUrl, newObject)
+  return response.data
+}
+
+const updateTodo = async newObject => {
+  const response = await axios.put(`${baseUrl}${newObject.id}/`, newObject)
+  return response.data
+}
+
+const deleteTodo = async id => await axios.delete(`${baseUrl}${id}/`)
+
+export default {
+  getAll,
+  createTodo,
+  updateTodo,
+  deleteTodo
+}

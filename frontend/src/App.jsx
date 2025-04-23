@@ -1,70 +1,99 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import Items from './components/Items'
+import TabList from './components/TabList'
+import Modal from './components/Modal.jsx'
+import TodoService from './services/todo'
+// import './App.css'
 
-
-const todoItems = [
-  {
-    id: 1,
-    title: 'Go to Market',
-    description: 'Buy ingredients to prepare dinner',
-    completed: true,
-  },
-  {
-    id: 2,
-    title: 'Study',
-    description: 'Read Algebra and History textbook for the upcoming test',
-    completed: false,
-  },
-  {
-    id: 3,
-    title: 'Sammy\'s books',
-    description: 'Go to library to return Sammy\'s books',
-    completed: true,
-  },
-  {
-    id: 4,
-    title: 'Article',
-    description: 'Write article on how to use Django with React',
-    completed: false,
-  },
-]
 
 const App = () => {
-  const [todoList, setTodoList] = useState(todoItems)
+  const [modal, setModal] = useState(false)
+  const [activeItem, setActiveItem] = useState({
+    title: '',
+    description: '',
+    completed: false,
+  })
+  const [todoList, setTodoList] = useState([])
   const [viewCompleted, setViewCompleted] = useState(false)
+
+  useEffect(() => {
+    TodoService.getAll()
+      .then(todos =>
+        setTodoList(todos)
+      )
+  }, [])
 
   const displayCompleted = (status) => setViewCompleted(status)
 
-  const TabList = () => {
-    return (
-      <div className='nav nav-tabs'>
-        <span
-          className={`nav-link ${viewCompleted ? 'active' : ''}`}
-          onClick={() => displayCompleted(true)}
-        >
-          Complete
-        </span>
+  const toggle = () => setModal(!modal)
 
-        <span
-          className={`nav-link ${viewCompleted ? '' : 'active'}`}
-          onClick={() => displayCompleted(true)}
-        >
-          Incomplete
-        </span>
-      </div >
-    )
+  const handleSubmit = async (item) => {
+    toggle()
+    if (item.id) {
+      const updatedTodo = await TodoService.updateTodo(item)
+      setTodoList(todoList.map(todo =>
+        todo.id === updatedTodo.id ? updatedTodo : todo
+      ))
+    } else {
+      const newTodo = await TodoService.createTodo(item)
+      setTodoList([...todoList, newTodo])
+    }
   }
 
-  const Items = () => {
-    return todoList.filter(item =>
-      item.completed === viewCompleted
-    )
-      .map(item => 
-      
-      )
+  const handleDelete = async (item) => {
+    await TodoService.deleteTodo(item.id)
+    setTodoList(todoList.filter(todo =>
+      todo.id !== item.id
+    ))
   }
+
+  const createItem = () => {
+    const item = { title: '', description: '', completed: false }
+    toggle()
+    setActiveItem(item)
+  }
+
+  const editItem = (item) => {
+    toggle()
+    setActiveItem(item)
+  }
+
+  return (
+    <main className="container">
+      <h1 className="text-uppercase text-center my-4">Todo app</h1>
+      <div className="row">
+        <div className="col-md-6 col-sm-10 mx-auto p-0">
+          <div className="card p-3">
+            <div className="mb-4">
+              <button
+                className="btn btn-primary"
+                onClick={createItem}
+              >
+                Add task
+              </button>
+            </div>
+            <TabList
+              viewCompleted={viewCompleted}
+              displayCompleted={displayCompleted}
+            />
+            <Items
+              todoList={todoList}
+              viewCompleted={viewCompleted}
+              editItem={editItem}
+              handleDelete={handleDelete}
+            />
+          </div>
+        </div>
+      </div>
+      {modal ? (
+        <Modal
+          activeItem={activeItem}
+          toggle={toggle}
+          onSave={handleSubmit}
+        />
+      ) : null}
+    </main>
+  )
 }
 
 export default App
