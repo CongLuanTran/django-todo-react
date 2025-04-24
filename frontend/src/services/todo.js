@@ -11,8 +11,8 @@ const createTodo = async newObject => {
   return response.data
 }
 
-const updateTodo = async newObject => {
-  const response = await axios.put(`${baseUrl}${newObject.id}/`, newObject)
+const updateTodo = async object => {
+  const response = await axios.put(`${baseUrl}${object.id}/`, object)
   return response.data
 }
 
