@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   Button,
   Modal,
@@ -10,11 +10,15 @@ import {
   Input,
   Label,
 } from 'reactstrap'
+import { hideModal } from '../reducers/modalReducer'
+import { resetItem, setItem } from '../reducers/activeReducer'
+import { createTodo, editTodo } from '../reducers/todoReducer'
 
-const CustomModal = (props) => {
+const CustomModal = () => {
 
-  const [activeItem, setActiveItem] = useState(props.activeItem)
-  const { toggle, onSave } = props
+  const activeItem = useSelector(state => state.active)
+  console.log(activeItem)
+  const dispatch = useDispatch()
 
   const handleChange = (e) => {
     let { name, value } = e.target
@@ -23,7 +27,21 @@ const CustomModal = (props) => {
       value = e.target.checked
     }
 
-    setActiveItem({ ...activeItem, [name]: value })
+    dispatch(setItem({ ...activeItem, [name]: value }))
+  }
+
+  const onSave = () => {
+    dispatch(hideModal())
+    if (activeItem.id) {
+      dispatch(editTodo(activeItem))
+    } else {
+      dispatch(createTodo(activeItem))
+    }
+    dispatch(resetItem())
+  }
+
+  const toggle = () => {
+    dispatch(hideModal())
   }
 
   return (
@@ -69,7 +87,7 @@ const CustomModal = (props) => {
       <ModalFooter>
         <Button
           color='success'
-          onClick={() => onSave(activeItem)}
+          onClick={onSave}
         >
           Save
         </Button>

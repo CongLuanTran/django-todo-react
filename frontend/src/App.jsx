@@ -1,61 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Items from './components/Items'
 import TabList from './components/TabList'
 import Modal from './components/Modal.jsx'
-import TodoService from './services/todo'
+import { useDispatch, useSelector } from 'react-redux'
+import { initializeTodos } from './reducers/todoReducer.js'
+import { showModal } from './reducers/modalReducer.js'
 // import './App.css'
 
 
 const App = () => {
-  const [modal, setModal] = useState(false)
-  const [activeItem, setActiveItem] = useState({
-    title: '',
-    description: '',
-    completed: false,
-  })
-  const [todoList, setTodoList] = useState([])
-  const [viewCompleted, setViewCompleted] = useState(false)
+  const modal = useSelector(state => state.modal)
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    TodoService.getAll()
-      .then(todos =>
-        setTodoList(todos)
-      )
-  }, [])
-
-  const displayCompleted = (status) => setViewCompleted(status)
-
-  const toggle = () => setModal(!modal)
-
-  const handleSubmit = async (item) => {
-    toggle()
-    if (item.id) {
-      const updatedTodo = await TodoService.updateTodo(item)
-      setTodoList(todoList.map(todo =>
-        todo.id === updatedTodo.id ? updatedTodo : todo
-      ))
-    } else {
-      const newTodo = await TodoService.createTodo(item)
-      setTodoList([...todoList, newTodo])
-    }
-  }
-
-  const handleDelete = async (item) => {
-    await TodoService.deleteTodo(item.id)
-    setTodoList(todoList.filter(todo =>
-      todo.id !== item.id
-    ))
-  }
+    dispatch(initializeTodos())
+  }, [dispatch])
 
   const createItem = () => {
-    const item = { title: '', description: '', completed: false }
-    toggle()
-    setActiveItem(item)
-  }
-
-  const editItem = (item) => {
-    toggle()
-    setActiveItem(item)
+    dispatch(showModal())
   }
 
   return (
@@ -72,25 +34,13 @@ const App = () => {
                 Add task
               </button>
             </div>
-            <TabList
-              viewCompleted={viewCompleted}
-              displayCompleted={displayCompleted}
-            />
-            <Items
-              todoList={todoList}
-              viewCompleted={viewCompleted}
-              editItem={editItem}
-              handleDelete={handleDelete}
-            />
+            <TabList />
+            <Items />
           </div>
         </div>
       </div>
       {modal ? (
-        <Modal
-          activeItem={activeItem}
-          toggle={toggle}
-          onSave={handleSubmit}
-        />
+        <Modal />
       ) : null}
     </main>
   )
