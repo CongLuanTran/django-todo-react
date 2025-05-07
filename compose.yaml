@@ -1,0 +1,17 @@
+services:
+    backend:
+        build:
+            context: backend
+        expose:
+            -   8000
+    proxy:
+        build:
+            context: .
+        volumes:
+            -   ./frontend/dist/:/usr/share/nginx/html/frontend
+            -   ./backend/staticfiles/:/usr/share/nginx/html/backend_static
+        ports:
+            -   80:80
+        depends_on:
+            -   backend
+
