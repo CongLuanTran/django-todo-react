@@ -18,7 +18,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Then, add the rest of the project source code and install it
 # Installing separately from its dependencies allows optimal layer caching
-ADD . /app
+COPY . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
   uv sync --frozen --no-dev
 
@@ -28,7 +28,5 @@ ENV PATH="/app/.venv/bin:$PATH"
 # Reset the entrypoint, don't invoke `uv`
 ENTRYPOINT []
 
-# Run the FastAPI application by default
-# Uses `fastapi dev` to enable hot-reloading when the `watch` sync occurs
 # Uses `--host 0.0.0.0` to allow access from outside the container
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "backend.asgi:application", "-k", "uvicorn_worker.UvicornWorker"]
