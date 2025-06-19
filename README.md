@@ -43,6 +43,10 @@ SECRET_KEY='dw)@bpkd!!$o)%2=tw)-3z5kgnxj_e(mmg%i@mcaz1)h-)o^20'
 ALLOWED_HOSTS=localhost,127.0.0.1
 ```
 
+You must add the exact HTTP hostnames that your will use. If you
+list only `localhost` but not `127.0.0.1` (although they are logically the same),
+accessing the app via `<http://127.0.0.1> will return a 400 Bad Request.
+
 ### Frontend
 
 The styling of the frontend simply follow the guide, which use Bootstrap.
