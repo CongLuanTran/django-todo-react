@@ -23,7 +23,7 @@ Since I use `environs` Python package to manage environment variables, this
 be recursively searched upward. For `SECRET_KEY` it is advised to use
 Django functionality to generate a random key, e.g.
 
-```
+```bash
 # this should be run in a environment with Django installed
 python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
 ```
@@ -45,7 +45,7 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 
 You must add the exact HTTP hostnames that your will use. If you
 list only `localhost` but not `127.0.0.1` (although they are logically the same),
-accessing the app via `<http://127.0.0.1> will return a 400 Bad Request.
+accessing the app via `127.0.0.1` will return a 400 Bad Request.
 
 ### Frontend
 
@@ -55,3 +55,4 @@ However, I have made significate changes to the structure:
 - Instead of `create-react-app` as suggested in the guide, I used `vite`.
 - Components are modularize instead of putting everything in the `App` file.
 - State is managed with Redux and Redux Toolkit to avoid passing props around.
+
